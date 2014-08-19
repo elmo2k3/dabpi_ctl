@@ -165,7 +165,6 @@ void si46xx_dab_start_digital_service(uint32_t service_id,
 
 	si46xx_write_data(SI46XX_DAB_START_DIGITAL_SERVICE,data,11);
 	si46xx_read(buf,5);
-	//print_hex_str(buf,5);
 }
 
 static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
@@ -173,8 +172,11 @@ static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
 	uint16_t remaining_bytes;
 	uint16_t pos;
 	uint8_t service_num;
+	uint8_t component_num;
+	uint8_t i;
 
-	if(len<6) return; // no list available? exit
+	if(len<6)
+		return; // no list available? exit
 	if(len >= 9){
 		dab_service_list.list_size = data[5]<<8 | data[4];
 		dab_service_list.version = data[7]<<8 | data[6];
@@ -182,55 +184,55 @@ static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
 	}
 	// 9,10,11 are align pad
 	pos = 12;
-	if(len <= pos) return; // no services? exit
+	if(len <= pos)
+		return; // no services? exit
 
 	remaining_bytes = len - pos;
 	service_num = 0;
-	// size of one service with one component: 28 byte
+	// size of one service with zero component: 24 byte
+	// every component + 4 byte
 	while(service_num < dab_service_list.num_services){
 		dab_service_list.services[service_num].service_id =
-			data[pos+3]<<24 | data[pos+2]<<16 | data[pos+1]<<8 | data[pos];
+			data[pos+3]<<24 |
+			data[pos+2]<<16 |
+			data[pos+1]<<8 |
+			data[pos];
+		component_num = data[pos+5] & 0x0F;
+		dab_service_list.services[service_num].num_components = component_num;
 		memcpy(dab_service_list.services[service_num].service_label,
 			&data[pos+8],16);
-//		dab_service_list.services[service_num].service_label[0] = data[pos+8];
-//		dab_service_list.services[service_num].service_label[1] = data[pos+9];
-//		dab_service_list.services[service_num].service_label[2] = data[pos+10];
-//		dab_service_list.services[service_num].service_label[3] = data[pos+11];
-//		dab_service_list.services[service_num].service_label[4] = data[pos+12];
-//		dab_service_list.services[service_num].service_label[5] = data[pos+13];
-//		dab_service_list.services[service_num].service_label[6] = data[pos+14];
-//		dab_service_list.services[service_num].service_label[7] = data[pos+15];
-//		dab_service_list.services[service_num].service_label[8] = data[pos+16];
-//		dab_service_list.services[service_num].service_label[9] = data[pos+17];
-//		dab_service_list.services[service_num].service_label[10] = data[pos+18];
-//		dab_service_list.services[service_num].service_label[11] = data[pos+19];
-//		dab_service_list.services[service_num].service_label[12] = data[pos+20];
-//		dab_service_list.services[service_num].service_label[13] = data[pos+21];
-//		dab_service_list.services[service_num].service_label[14] = data[pos+22];
-//		dab_service_list.services[service_num].service_label[15] = data[pos+23];
 		dab_service_list.services[service_num].service_label[16] = '\0';
-		dab_service_list.services[service_num].component_id =
-			data[pos+25] << 8 | data[pos+24];
-		pos +=28;
+		for(i=0;i<component_num;i++){
+			dab_service_list.services[service_num].component_id[i] =
+				data[pos+25] << 8 |
+				data[pos+24];
+			pos += 4;
+		}
+		pos +=24;
 		service_num++;
 	}
 }
 
 void si46xx_dab_print_service_list()
 {
-	uint8_t i;
+	uint8_t i,p;
 
 	printf("List size:     %d\r\n",dab_service_list.list_size);
 	printf("List version:  %d\r\n",dab_service_list.version);
 	printf("Services:      %d\r\n",dab_service_list.num_services);
 
 	for(i=0;i<dab_service_list.num_services;i++){
-		printf("Num: %u  Service ID: %x  Service Name: %s  Component ID: %d\r\n",
+		printf("Num: %2u  Service ID: %8x  Service Name: %s  Component ID: %d\r\n",
 			i,
 			dab_service_list.services[i].service_id,
 			dab_service_list.services[i].service_label,
-			dab_service_list.services[i].component_id
+			dab_service_list.services[i].component_id[0]
+		);
+		for(p=0;p<dab_service_list.services[i].num_components;p++){
+			printf("                                                               Component ID: %d\r\n",
+				dab_service_list.services[i].component_id[i]
 			);
+		}
 	}
 }
 
@@ -238,9 +240,9 @@ void si46xx_dab_start_digital_service_num(uint32_t num)
 {
 	printf("Starting service %s %x %x\r\n", dab_service_list.services[num].service_label,
 						dab_service_list.services[num].service_id,
-						dab_service_list.services[num].component_id);
+						dab_service_list.services[num].component_id[0]);
 	si46xx_dab_start_digital_service(dab_service_list.services[num].service_id,
-			dab_service_list.services[num].component_id);
+			dab_service_list.services[num].component_id[0]);
 }
 
 int si46xx_dab_get_digital_service_list()
@@ -263,7 +265,7 @@ int si46xx_dab_get_digital_service_list()
 
 void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list)
 {
-	uint8_t data[7];
+	uint8_t data[3+4*48]; // max 48 frequencies
 	uint8_t i;
 	char buf[4];
 
@@ -273,7 +275,7 @@ void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list)
 		return;
 	}
 
-	data[0] = 1; // NUM_FREQS 1-48
+	data[0] = num; // NUM_FREQS 1-48
 	data[1] = 0;
 	data[2] = 0;
 
@@ -499,6 +501,12 @@ void si46xx_dab_digrad_status()
 	printf("FIC_QUALITY: %d\r\n",buf[8]);
 	printf("CNR %d\r\n",buf[9]);
 	printf("FFT_OFFSET %d\r\n",(int8_t)buf[17]);
+	printf("Tuned frequency %dkHz\r\n",buf[12] |
+					   buf[13]<<8 |
+					   buf[14]<<16 |
+					   buf[15]<<24);
+	printf("Tuned index %d\r\n",buf[16]);
+
 	printf("ANTCAP: %d\r\n",(buf[19]<<8)+buf[18]);
 }
 

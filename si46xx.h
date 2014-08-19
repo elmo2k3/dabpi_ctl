@@ -67,23 +67,67 @@
 
 #define SI46XX_DIGITAL_SERVICE_INT_SOURCE 0x8100
 
+// DAB channels
+#define CHAN_5A 174928
+#define CHAN_5B 176640
+#define CHAN_5C 178352
+#define CHAN_5D 180064
+#define CHAN_6A 181936
+#define CHAN_6B 183648
+#define CHAN_6C 185360
+#define CHAN_6D 187072
+#define CHAN_7A 188928
+#define CHAN_7B 190640
+#define CHAN_7C 192352
+#define CHAN_7D 194064
+#define CHAN_8A 195936
+#define CHAN_8B 197648
+#define CHAN_8C 199360
+#define CHAN_8D 201072
+#define CHAN_9A 202928
+#define CHAN_9B 204640
+#define CHAN_9C 206352
+#define CHAN_9D 208064
+#define CHAN_10A 209936
+#define CHAN_10B 211648
+#define CHAN_10C 213360
+#define CHAN_10D 215072
+#define CHAN_11A 216928
+#define CHAN_11B 218640
+#define CHAN_11C 220352
+#define CHAN_11D 222064
+#define CHAN_12A 223936
+#define CHAN_12B 225648
+#define CHAN_12C 227360
+#define CHAN_12D 229072
+#define CHAN_13A 230784
+#define CHAN_13B 232496
+#define CHAN_13C 234208
+#define CHAN_13D 235776
+#define CHAN_13E 237488
+#define CHAN_13F 239200
+
+#define MAX_SERVICES 32
+#define MAX_COMPONENTS 15
+
 struct dab_service{
     uint32_t service_id;
     uint8_t service_info1;
     uint8_t service_info2;
     uint8_t service_info3;
     char service_label[17];
+    uint8_t num_components;
     // only one component by now
-    uint16_t component_id;
-    uint8_t component_info;
-    uint8_t component_valid_flags;
+    uint16_t component_id[MAX_COMPONENTS];
+    uint8_t component_info[MAX_COMPONENTS];
+    uint8_t component_valid_flags[MAX_COMPONENTS];
 };
 
 struct _dab_service_list{
     uint16_t list_size;
     uint16_t version;
     uint8_t num_services;
-    struct dab_service services[32];
+    struct dab_service services[MAX_SERVICES];
 }dab_service_list;
 
 void si46xx_init(void);

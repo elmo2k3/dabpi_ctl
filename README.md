@@ -1,5 +1,9 @@
 # dabpi_ctl - RPi fm/fmhd/dab receiver control interface
 
+## Warning
+
+This project is pre-alpha. Most features are still missing.
+
 ## Requirements
 
 Be sure to enable SPI in raspi-config.
@@ -58,6 +62,10 @@ usage: ./dabpi_ctl [-a|-b]
   -e             dab status
   -f num         start service num of dab service list
   -g             get dab service list
+  -i             tune to num in dab frequency list
+  -j num         set frequency list
+                    0   NRW
+                    1   Bayern
   -h             this help
 ```
 ### Examples

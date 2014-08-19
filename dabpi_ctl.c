@@ -22,6 +22,8 @@
 #include <getopt.h>
 #include "si46xx.h"
 
+#define ARRAY_SIZE(x) (sizeof(x)/sizeof((x)[0]))
+
 void tune_fm(void)
 {
 	si46xx_init_fm();
@@ -34,12 +36,22 @@ void tune_fm(void)
 	si46xx_fm_tune_freq(98500,0);
 }
 
-uint32_t frequency_list[] = {(uint32_t)222064};
+uint32_t frequency_list_nrw[] = {	CHAN_5C,
+					CHAN_11D};
+uint32_t frequency_list_bayern[] = {	CHAN_5C,
+					CHAN_12D,
+					CHAN_11D,
+					CHAN_9C,
+					CHAN_10C,
+					CHAN_11A,
+					CHAN_11C,
+					CHAN_12A,
+					CHAN_6A};
 
 void tune_dab(void)
 {
 	si46xx_init_dab();
-	si46xx_dab_set_freq_list(1,frequency_list);
+	si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_nrw),frequency_list_nrw);
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_SIGNAL_LEVEL_THRESHOLD,0);
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_SIGLOW_THRESHOLD,0);
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_ENABLE,0);
@@ -81,6 +93,10 @@ void show_help(char *prog_name)
 	printf("  -e             dab status\n");
 	printf("  -f num         start service num of dab service list\n");
 	printf("  -g             get dab service list\n");
+	printf("  -i             tune to num in dab frequency list\n");
+	printf("  -j num         set frequency list\n");
+	printf("                    0   NRW\r\n");
+	printf("                    1   Bayern\r\n");
 	printf("  -h             this help\n");
 }
 
@@ -89,9 +105,10 @@ int main(int argc, char **argv)
 
 	int c;
 	int frequency;
+	int tmp;
 
 	si46xx_init();
-	while((c=getopt(argc, argv, "abc:def:gh")) != -1){
+	while((c=getopt(argc, argv, "abc:def:ghi:j:")) != -1){
 		switch(c){
 		case 'a':
 			tune_dab();
@@ -120,6 +137,19 @@ int main(int argc, char **argv)
 			break;
 		case 'h':
 			show_help(argv[0]);
+			break;
+		case 'i':
+			si46xx_dab_tune_freq(atoi(optarg),0);
+			break;
+		case 'j':
+			tmp = atoi(optarg);
+			if(tmp == 0){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_nrw),
+							frequency_list_nrw);
+			}else if(tmp == 1){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bayern),
+							frequency_list_bayern);
+			}
 			break;
 		default:
 			show_help(argv[0]);
