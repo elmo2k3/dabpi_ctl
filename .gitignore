@@ -1,0 +1,4 @@
+*.o
+dabpi_ctl
+Session.vim
+*.*.swp
