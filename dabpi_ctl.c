@@ -38,7 +38,7 @@ void tune_fm(void)
 
 uint32_t frequency_list_nrw[] = {	CHAN_5C,
 					CHAN_11D};
-uint32_t frequency_list_bayern[] = {	CHAN_5C,
+uint32_t frequency_list_by[] = {	CHAN_5C,
 					CHAN_12D,
 					CHAN_11D,
 					CHAN_9C,
@@ -47,7 +47,45 @@ uint32_t frequency_list_bayern[] = {	CHAN_5C,
 					CHAN_11C,
 					CHAN_12A,
 					CHAN_6A};
-
+uint32_t frequency_list_bw[] = {	CHAN_5C,
+					CHAN_8D,
+					CHAN_9D,
+					CHAN_11B};
+uint32_t frequency_list_bb[] = {	CHAN_5C,
+					CHAN_7B,
+					CHAN_7D};
+uint32_t frequency_list_hb[] = {	CHAN_5C,
+					CHAN_7B};
+uint32_t frequency_list_hh[] = {	CHAN_5C,
+					CHAN_7A};
+uint32_t frequency_list_he[] = {	CHAN_5C,
+					CHAN_7B,
+					CHAN_11C};
+uint32_t frequency_list_mv[] = {	CHAN_5C,
+					CHAN_12B};
+uint32_t frequency_list_ni[] = {	CHAN_5C,
+					CHAN_6A,
+					CHAN_6D,
+					CHAN_11B,
+					CHAN_12A};
+uint32_t frequency_list_rp[] = {	CHAN_5C,
+					CHAN_11A};
+uint32_t frequency_list_sl[] = {	CHAN_5C,
+					CHAN_9A};
+uint32_t frequency_list_sn[] = {	CHAN_5C,
+					CHAN_6C,
+					CHAN_8D,
+					CHAN_9C,
+					CHAN_12A};
+uint32_t frequency_list_st[] = {	CHAN_5C,
+					CHAN_11C,
+					CHAN_12C};
+uint32_t frequency_list_sh[] = {	CHAN_5C,
+					CHAN_9C};
+uint32_t frequency_list_th[] = {	CHAN_5C,
+					CHAN_7B,
+					CHAN_9C,
+					CHAN_12B};
 void tune_dab(void)
 {
 	si46xx_init_dab();
@@ -95,8 +133,21 @@ void show_help(char *prog_name)
 	printf("  -g             get dab service list\n");
 	printf("  -i             tune to num in dab frequency list\n");
 	printf("  -j num         set frequency list\n");
-	printf("                    0   NRW\r\n");
+	printf("                    0   Baden-Wuertemberg\r\n");
 	printf("                    1   Bayern\r\n");
+	printf("                    2   Berlin-Brandenburg\r\n");
+	printf("                    3   Bremen\r\n");
+	printf("                    4   Hamburg\r\n");
+	printf("                    5   Hessen\r\n");
+	printf("                    6   Mecklenburg-Vorpommern\r\n");
+	printf("                    7   Niedersachsen\r\n");
+	printf("                    8   Nordrhein-Westfalen\r\n");
+	printf("                    9   Rheinland-Pfalz\r\n");
+	printf("                    10  Saarland\r\n");
+	printf("                    11  Sachsen\r\n");
+	printf("                    12  Sachsen-Anhalt\r\n");
+	printf("                    13  Schleswig-Holstein\r\n");
+	printf("                    14  Thueringen\r\n");
 	printf("  -h             this help\n");
 }
 
@@ -144,11 +195,52 @@ int main(int argc, char **argv)
 		case 'j':
 			tmp = atoi(optarg);
 			if(tmp == 0){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bw),
+							frequency_list_bw);
+			}else if(tmp == 1){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_by),
+							frequency_list_by);
+			}else if(tmp == 2){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bb),
+							frequency_list_bb);
+			}else if(tmp == 3){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_hb),
+							frequency_list_hb);
+			}else if(tmp == 4){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_hh),
+							frequency_list_hh);
+			}else if(tmp == 5){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_he),
+							frequency_list_he);
+			}else if(tmp == 6){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_mv),
+							frequency_list_mv);
+			}else if(tmp == 7){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_ni),
+							frequency_list_ni);
+			}else if(tmp == 8){
 				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_nrw),
 							frequency_list_nrw);
-			}else if(tmp == 1){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bayern),
-							frequency_list_bayern);
+			}else if(tmp == 9){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_rp),
+							frequency_list_rp);
+			}else if(tmp == 10){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sl),
+							frequency_list_sl);
+			}else if(tmp == 11){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sn),
+							frequency_list_sn);
+			}else if(tmp == 12){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_st),
+							frequency_list_st);
+			}else if(tmp == 13){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sh),
+							frequency_list_sh);
+			}else if(tmp == 14){
+				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_th),
+							frequency_list_th);
+			}else{
+				printf("Region %d not implemented\r\n",tmp);
 			}
 			break;
 		default:
