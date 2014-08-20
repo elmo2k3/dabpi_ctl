@@ -64,8 +64,22 @@ usage: ./dabpi_ctl [-a|-b]
   -g             get dab service list
   -i             tune to num in dab frequency list
   -j num         set frequency list
-                    0   NRW
+                    0   Baden-Wuertemberg
                     1   Bayern
+                    2   Berlin-Brandenburg
+                    3   Bremen
+                    4   Hamburg
+                    5   Hessen
+                    6   Mecklenburg-Vorpommern
+                    7   Niedersachsen
+                    8   Nordrhein-Westfalen
+                    9   Rheinland-Pfalz
+                    10  Saarland
+                    11  Sachsen
+                    12  Sachsen-Anhalt
+                    13  Schleswig-Holstein
+                    14  Thueringen
+  -k num         scan frequency list (num is region like -j)
   -h             this help
 ```
 ### Examples

@@ -148,7 +148,60 @@ void show_help(char *prog_name)
 	printf("                    12  Sachsen-Anhalt\r\n");
 	printf("                    13  Schleswig-Holstein\r\n");
 	printf("                    14  Thueringen\r\n");
+	printf("  -k num         scan frequency list (num is region like -j)\n");
 	printf("  -h             this help\n");
+}
+
+void load_regional_channel_list(uint8_t tmp)
+{
+	if(tmp == 0){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bw),
+					frequency_list_bw);
+	}else if(tmp == 1){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_by),
+					frequency_list_by);
+	}else if(tmp == 2){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bb),
+					frequency_list_bb);
+	}else if(tmp == 3){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_hb),
+					frequency_list_hb);
+	}else if(tmp == 4){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_hh),
+					frequency_list_hh);
+	}else if(tmp == 5){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_he),
+					frequency_list_he);
+	}else if(tmp == 6){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_mv),
+					frequency_list_mv);
+	}else if(tmp == 7){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_ni),
+					frequency_list_ni);
+	}else if(tmp == 8){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_nrw),
+					frequency_list_nrw);
+	}else if(tmp == 9){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_rp),
+					frequency_list_rp);
+	}else if(tmp == 10){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sl),
+					frequency_list_sl);
+	}else if(tmp == 11){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sn),
+					frequency_list_sn);
+	}else if(tmp == 12){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_st),
+					frequency_list_st);
+	}else if(tmp == 13){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sh),
+					frequency_list_sh);
+	}else if(tmp == 14){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_th),
+					frequency_list_th);
+	}else{
+		printf("Region %d not implemented\r\n",tmp);
+	}
 }
 
 int main(int argc, char **argv)
@@ -157,9 +210,10 @@ int main(int argc, char **argv)
 	int c;
 	int frequency;
 	int tmp;
+	struct dab_digrad_status_t dab_digrad_status;
 
 	si46xx_init();
-	while((c=getopt(argc, argv, "abc:def:ghi:j:")) != -1){
+	while((c=getopt(argc, argv, "abc:def:ghi:j:k:")) != -1){
 		switch(c){
 		case 'a':
 			tune_dab();
@@ -175,7 +229,8 @@ int main(int argc, char **argv)
 			si46xx_fm_rsq_status();
 			break;
 		case 'e':
-			si46xx_dab_digrad_status();
+			si46xx_dab_digrad_status(&dab_digrad_status);
+			si46xx_dab_digrad_status_print(&dab_digrad_status);
 			break;
 		case 'f':
 			si46xx_dab_get_digital_service_list();
@@ -194,54 +249,12 @@ int main(int argc, char **argv)
 			break;
 		case 'j':
 			tmp = atoi(optarg);
-			if(tmp == 0){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bw),
-							frequency_list_bw);
-			}else if(tmp == 1){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_by),
-							frequency_list_by);
-			}else if(tmp == 2){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_bb),
-							frequency_list_bb);
-			}else if(tmp == 3){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_hb),
-							frequency_list_hb);
-			}else if(tmp == 4){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_hh),
-							frequency_list_hh);
-			}else if(tmp == 5){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_he),
-							frequency_list_he);
-			}else if(tmp == 6){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_mv),
-							frequency_list_mv);
-			}else if(tmp == 7){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_ni),
-							frequency_list_ni);
-			}else if(tmp == 8){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_nrw),
-							frequency_list_nrw);
-			}else if(tmp == 9){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_rp),
-							frequency_list_rp);
-			}else if(tmp == 10){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sl),
-							frequency_list_sl);
-			}else if(tmp == 11){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sn),
-							frequency_list_sn);
-			}else if(tmp == 12){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_st),
-							frequency_list_st);
-			}else if(tmp == 13){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_sh),
-							frequency_list_sh);
-			}else if(tmp == 14){
-				si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_th),
-							frequency_list_th);
-			}else{
-				printf("Region %d not implemented\r\n",tmp);
-			}
+			load_regional_channel_list(tmp);
+			break;
+		case 'k':
+			tmp = atoi(optarg);
+			load_regional_channel_list(tmp);
+			si46xx_dab_scan();
 			break;
 		default:
 			show_help(argv[0]);

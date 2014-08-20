@@ -111,23 +111,45 @@
 #define MAX_COMPONENTS 15
 
 struct dab_service{
-    uint32_t service_id;
-    uint8_t service_info1;
-    uint8_t service_info2;
-    uint8_t service_info3;
-    char service_label[17];
-    uint8_t num_components;
-    // only one component by now
-    uint16_t component_id[MAX_COMPONENTS];
-    uint8_t component_info[MAX_COMPONENTS];
-    uint8_t component_valid_flags[MAX_COMPONENTS];
+	uint32_t service_id;
+	uint8_t service_info1;
+	uint8_t service_info2;
+	uint8_t service_info3;
+	char service_label[17];
+	uint8_t num_components;
+	// only one component by now
+	uint16_t component_id[MAX_COMPONENTS];
+	uint8_t component_info[MAX_COMPONENTS];
+	uint8_t component_valid_flags[MAX_COMPONENTS];
+};
+
+struct dab_digrad_status_t{
+	uint8_t hard_mute_int;
+	uint8_t fic_error_int;
+	uint8_t acq_int;
+	uint8_t rssi_h_int;
+	uint8_t rssi_l_int;
+	uint8_t hardmute;
+	uint8_t fic_error;
+	uint8_t acq;
+	uint8_t valid;
+	int8_t rssi; // -128-63
+	int8_t snr; // 0-20
+	uint8_t fic_quality; // 0-100
+	uint8_t cnr; // 0-54
+	uint16_t fib_error_count;
+	uint32_t frequency;
+	uint8_t tuned_index;
+	uint8_t fft_offset;
+	uint16_t read_ant_cap;
+	uint16_t cu_level; // 0-470
 };
 
 struct _dab_service_list{
-    uint16_t list_size;
-    uint16_t version;
-    uint8_t num_services;
-    struct dab_service services[MAX_SERVICES];
+	uint16_t list_size;
+	uint16_t version;
+	uint8_t num_services;
+	struct dab_service services[MAX_SERVICES];
 }dab_service_list;
 
 void si46xx_init(void);
@@ -140,12 +162,15 @@ void si46xx_fm_rds_status(void);
 
 void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list);
 void si46xx_dab_tune_freq(uint8_t index, uint8_t antcap);
-void si46xx_dab_digrad_status(void);
+void si46xx_dab_digrad_status(struct dab_digrad_status_t *status);
+void si46xx_dab_digrad_status_print(struct dab_digrad_status_t *status);
 int si46xx_dab_get_digital_service_list(void);
 void si46xx_dab_get_service_linking_info(uint32_t service_id);
 void si46xx_dab_start_digital_service(uint32_t service_id, uint32_t comp_id);
 void si46xx_dab_print_service_list(void);
 void si46xx_dab_start_digital_service_num(uint32_t num);
+
+void si46xx_dab_scan();
 
 #endif
 

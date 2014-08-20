@@ -48,6 +48,8 @@
 //#define CS_HIGH() GPIOA->BSRRL = SI46XX_PIN_NSS
 //#define RESET_LOW() GPIOB->BSRRH = GPIO_PIN_8
 //#define RESET_HIGH() GPIOB->BSRRL = GPIO_PIN_8
+//
+uint8_t dab_num_channels;
 
 void print_hex_str(uint8_t *str, uint16_t len)
 {
@@ -269,6 +271,8 @@ void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list)
 	uint8_t i;
 	char buf[4];
 
+	dab_num_channels = num;
+
 	printf("si46xx_dab_set_freq_list(): ");
 	if(num == 0 || num > 48){
 		printf("num must be between 1 and 48\r\n");
@@ -295,6 +299,7 @@ void si46xx_dab_tune_freq(uint8_t index, uint8_t antcap)
 {
 	uint8_t data[5];
 	char buf[4];
+	uint8_t timeout;
 
 	printf("si46xx_dab_tune_freq(%d): ",index);
 
@@ -304,9 +309,15 @@ void si46xx_dab_tune_freq(uint8_t index, uint8_t antcap)
 	data[2] = 0;
 	data[3] = antcap;
 	data[4] = 0;
-	si46xx_write_data(SI46XX_DAB_TUNE_FREQ,data,5);
 
-	si46xx_read(buf,4);
+	timeout = 10;
+	while(--timeout){
+		si46xx_read(buf,4);
+		if(buf[0] & 0x01)
+			break;
+		msleep(100);
+	}
+	si46xx_write_data(SI46XX_DAB_TUNE_FREQ,data,5);
 	print_hex_str(buf,4);
 }
 
@@ -485,29 +496,77 @@ void si46xx_dab_get_service_linking_info(uint32_t service_id)
 	si46xx_read(buf,24);
 }
 
-void si46xx_dab_digrad_status()
+void si46xx_dab_digrad_status_print(struct dab_digrad_status_t *status)
+{
+	printf("ACQ: %d\r\n",status->acq);
+	printf("VALID: %d\r\n",status->valid);
+	printf("RSSI: %d\r\n",status->rssi);
+	printf("SNR: %d\r\n",status->snr);
+	printf("FIC_QUALITY: %d\r\n",status->fic_quality);
+	printf("CNR %d\r\n",status->cnr);
+	printf("FFT_OFFSET %d\r\n",status->fft_offset);
+	printf("Tuned frequency %dkHz\r\n",status->frequency);
+	printf("Tuned index %d\r\n",status->tuned_index);
+
+	printf("ANTCAP: %d\r\n",status->read_ant_cap);
+}
+
+void si46xx_dab_digrad_status(struct dab_digrad_status_t *status)
 {
 	uint8_t data = (1<<3) | 1; // set digrad_ack and stc_ack
 	char buf[22];
+	uint8_t timeout = 100;
 
 	printf("si46xx_dab_digrad_status(): ");
-	si46xx_write_data(SI46XX_DAB_DIGRAD_STATUS,&data,1);
-	si46xx_read(buf,22);
-	print_hex_str(buf,22);
-	printf("ACQ: %d\r\n",buf[5] & 0x04);
-	printf("VALID: %d\r\n",buf[5] & 0x01);
-	printf("RSSI: %d\r\n",(int8_t)buf[6]);
-	printf("SNR: %d\r\n",(int8_t)buf[7]);
-	printf("FIC_QUALITY: %d\r\n",buf[8]);
-	printf("CNR %d\r\n",buf[9]);
-	printf("FFT_OFFSET %d\r\n",(int8_t)buf[17]);
-	printf("Tuned frequency %dkHz\r\n",buf[12] |
-					   buf[13]<<8 |
-					   buf[14]<<16 |
-					   buf[15]<<24);
-	printf("Tuned index %d\r\n",buf[16]);
+	timeout = 10;
+	while(--timeout){
+		si46xx_read(buf,4);
+		if(buf[0] & 0x01)
+			break;
+		msleep(100);
+	}
+	while(--timeout){
+		si46xx_write_data(SI46XX_DAB_DIGRAD_STATUS,&data,1);
+		si46xx_read(buf,22);
+		if(buf[0] & 0x81)
+			break;
+	}
+	if(!timeout){
+		printf("si46xx_dab_digrad_status() timeout reached\r\n");
+		return;
+	}
+	if(!status)
+		return;
 
-	printf("ANTCAP: %d\r\n",(buf[19]<<8)+buf[18]);
+	status->acq = (buf[5] & 0x04) ? 1:0;
+	status->valid = buf[5] & 0x01;
+	status->rssi = (int8_t)buf[6];
+	status->snr = (int8_t)buf[7];
+	status->fic_quality = buf[8];
+	status->cnr = buf[9];
+	status->fft_offset = (int8_t)buf[17];
+	status->frequency = buf[12] |
+			    buf[13]<<8 |
+			    buf[14]<<16 |
+			    buf[15]<<24;
+	status->tuned_index = buf[16];
+	status->read_ant_cap = buf[18] | buf[19]<<8;
+
+}
+
+void si46xx_dab_scan()
+{
+	uint8_t i;
+	struct dab_digrad_status_t status;
+
+	for(i=0;i<dab_num_channels;i++){
+		si46xx_dab_tune_freq(i,0);
+		si46xx_dab_digrad_status(&status);
+		printf("Channel %d: ACQ: %d RSSI: %d SNR: %d\r\n", i,
+								   status.acq,
+								   status.rssi,
+								   status.snr);
+	}
 }
 
 void si46xx_set_property(uint16_t property_id, uint16_t value)
