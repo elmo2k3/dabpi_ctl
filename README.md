@@ -60,9 +60,9 @@ usage: ./dabpi_ctl [-a|-b]
   -c frequency   tune frequency in FM mode
   -d             fm status
   -e             dab status
-  -f service     start service num of dab service list
+  -f service     start service of dab service list
   -g             get dab service list
-  -i channel     tune to num in dab frequency list
+  -i channel     tune to channel in dab frequency list
   -j region      set frequency list
                     0   Baden-Wuertemberg
                     1   Bayern
@@ -79,7 +79,7 @@ usage: ./dabpi_ctl [-a|-b]
                     12  Sachsen-Anhalt
                     13  Schleswig-Holstein
                     14  Thueringen
-  -k region      scan frequency list (num is region like -j)
+  -k region      scan frequency list
   -h             this help
 ```
 ### Examples
@@ -91,18 +91,7 @@ pi@raspberrypi ~/dabpi_ctl $ sudo ./dabpi_ctl -b
 si46xx_init_mode_fm()
 si46xx_get_sys_state answer: 800000c001ff
 si46xx_get_part_info answer: 800000c0000000005012000000005012000000000100
-si46xx_set_property(2048,3)
-800000c0
-si46xx_set_property(12802,0)
-800000c0
-si46xx_set_property(12804,0)
-800000c0
-si46xx_set_property(13568,0)
-800000c0
-si46xx_set_property(5906,0)
-800000c0
-si46xx_set_property(514,4096)
-800000c0
+[...]
 si46xx_fm_tune_freq(98500)
 808000c0
 pi@raspberrypi ~/dabpi_ctl $
@@ -114,5 +103,78 @@ Tune to radio station 106.700MHz:
 pi@raspberrypi ~/dabpi_ctl $ sudo ./dabpi_ctl -c 106700
 si46xx_fm_tune_freq(106700)
 808000c0
+pi@raspberrypi ~/dabpi_ctl $
+```
+
+Enter DAB mode and scan all channels in the list for NRW:
+
+```bash
+pi@raspberrypi ~/dabpi_ctl $ sudo ./dabpi_ctl -a -k 8
+si46xx_init_mode_dab()
+[...]
+si46xx_dab_tune_freq(0): 818000c0
+si46xx_dab_digrad_status(): Channel 0: ACQ: 1 RSSI: 45 SNR: -10 Name: DR Deutschland
+si46xx_dab_tune_freq(1): 818000c0
+si46xx_dab_digrad_status(): Channel 1: ACQ: 1 RSSI: 41 SNR: -10 Name: Radio fuer NRW
+pi@raspberrypi ~/dabpi_ctl $
+```
+
+Select DAB channel:
+
+```bash
+pi@raspberrypi ~/dabpi_ctl $ sudo ./dabpi_ctl -i 1
+si46xx_dab_tune_freq(0): 818000c0
+pi@raspberrypi ~/dabpi_ctl $
+```
+
+Get ensemble information:
+
+```bash
+pi@raspberrypi ~/dabpi_ctl $ sudo ./dabpi_ctl -g
+si46xx_dab_get_digital_service_list()
+List size:     370
+List version:  227
+Services:      13
+Num:  0  Service ID: e0d01005  Service Name: WDR-INFO          Component ID: 49162
+                                                               Component ID: 49162
+Num:  1  Service ID:     109d  Service Name: Domradio          Component ID: 12
+                                                               Component ID: 0
+Num:  2  Service ID: e0d01006  Service Name: WDR-TPEG          Component ID: 49163
+                                                               Component ID: 0
+Num:  3  Service ID:     d394  Service Name: WDR 4             Component ID: 14
+                                                               Component ID: 0
+Num:  4  Service ID:     df92  Service Name: VERA              Component ID: 8
+                                                               Component ID: 0
+Num:  5  Service ID:     d391  Service Name: 1LIVE             Component ID: 1
+                                                               Component ID: 0
+Num:  6  Service ID:     d395  Service Name: WDR 5             Component ID: 4
+                                                               Component ID: 0
+Num:  7  Service ID:     d496  Service Name: FUNKHAUS EUROPA   Component ID: 5
+                                                               Component ID: 0
+Num:  8  Service ID: e0d01004  Service Name: WDR-EPG           Component ID: 49161
+                                                               Component ID: 0
+Num:  9  Service ID:     df95  Service Name: KinderRadioKanal  Component ID: 2
+                                                               Component ID: 0
+Num: 10  Service ID:     df91  Service Name: 1LIVE diggi       Component ID: 3
+                                                               Component ID: 0
+Num: 11  Service ID:     1462  Service Name: RADIO IMPALA      Component ID: 13
+                                                               Component ID: 0
+Num: 12  Service ID:     d392  Service Name: WDR 2             Component ID: 7
+                                                               Component ID: 0
+pi@raspberrypi ~/dabpi_ctl $
+```
+
+Start one of the services in ensemble:
+
+```bash
+pi@raspberrypi ~/dabpi_ctl $ sudo ./dabpi_ctl -f 5
+si46xx_dab_get_digital_service_list()
+List size:     370
+List version:  227
+Services:      13
+Num:  0  Service ID: e0d01005  Service Name: WDR-INFO          Component ID: 49162
+                                                               Component ID: 49162
+[...]
+Starting service 1LIVE            d391 1
 pi@raspberrypi ~/dabpi_ctl $
 ```
