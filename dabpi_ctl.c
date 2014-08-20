@@ -129,9 +129,9 @@ void show_help(char *prog_name)
 	printf("  -c frequency   tune frequency in FM mode\n");
 	printf("  -d             fm status\n");
 	printf("  -e             dab status\n");
-	printf("  -f service     start service num of dab service list\n");
+	printf("  -f service     start service of dab service list\n");
 	printf("  -g             get dab service list\n");
-	printf("  -i channel     tune to num in dab frequency list\n");
+	printf("  -i channel     tune to channel in dab frequency list\n");
 	printf("  -j region      set frequency list\n");
 	printf("                    0   Baden-Wuertemberg\r\n");
 	printf("                    1   Bayern\r\n");
@@ -148,7 +148,7 @@ void show_help(char *prog_name)
 	printf("                    12  Sachsen-Anhalt\r\n");
 	printf("                    13  Schleswig-Holstein\r\n");
 	printf("                    14  Thueringen\r\n");
-	printf("  -k region      scan frequency list (num is region like -j)\n");
+	printf("  -k region      scan frequency list\n");
 	printf("  -h             this help\n");
 }
 

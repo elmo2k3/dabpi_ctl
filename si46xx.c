@@ -77,17 +77,6 @@ static void si46xx_write_host_load_data(uint8_t cmd,
 	CS_HIGH();
 }
 
-static void si46xx_write_data(uint8_t cmd,
-				uint8_t *data,
-				uint16_t len)
-{
-
-	CS_LOW();
-	SPI_Write(&cmd,1);
-	SPI_Write(data,len);
-	CS_HIGH();
-}
-
 static void si46xx_read(uint8_t *data, uint8_t cnt)
 {
 	uint8_t zero = 0;
@@ -98,6 +87,26 @@ static void si46xx_read(uint8_t *data, uint8_t cnt)
 	SPI_Write(data,cnt);
 	CS_HIGH();
 	msleep(1); // make sure cs is high for 20us
+}
+
+static void si46xx_write_data(uint8_t cmd,
+				uint8_t *data,
+				uint16_t len)
+{
+	uint8_t timeout;
+	uint8_t buf[4];
+
+	timeout = 100; // wait for CTS
+	while(--timeout){
+		si46xx_read(buf,4);
+		if(buf[0] & 0x80)
+			break;
+	}
+
+	CS_LOW();
+	SPI_Write(&cmd,1);
+	SPI_Write(data,len);
+	CS_HIGH();
 }
 
 static uint16_t si46xx_read_dynamic(uint8_t *data)
@@ -215,6 +224,28 @@ static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
 	}
 }
 
+void si46xx_dab_get_ensemble_info()
+{
+	char buf[22];
+	char data;
+	uint8_t timeout;
+	char label[17];
+
+	//data[0] = (1<<4) | (1<<0); // force_wb, low side injection
+	data = 0;
+
+	si46xx_write_data(SI46XX_DAB_GET_ENSEMBLE_INFO,&data,1);
+	timeout = 10;
+	while(--timeout){ // completed with CTS
+		si46xx_read(buf,22);
+		if(buf[0] & 0x80)
+			break;
+	}
+	memcpy(label,&buf[6],16);
+	label[16] = '\0';
+	printf("Name: %s",label);
+}
+
 void si46xx_dab_print_service_list()
 {
 	uint8_t i,p;
@@ -310,14 +341,14 @@ void si46xx_dab_tune_freq(uint8_t index, uint8_t antcap)
 	data[3] = antcap;
 	data[4] = 0;
 
-	timeout = 10;
-	while(--timeout){
+	si46xx_write_data(SI46XX_DAB_TUNE_FREQ,data,5);
+	timeout = 20;
+	while(--timeout){ // wait for tune to complete
 		si46xx_read(buf,4);
 		if(buf[0] & 0x01)
 			break;
 		msleep(100);
 	}
-	si46xx_write_data(SI46XX_DAB_TUNE_FREQ,data,5);
 	print_hex_str(buf,4);
 }
 
@@ -520,12 +551,6 @@ void si46xx_dab_digrad_status(struct dab_digrad_status_t *status)
 	printf("si46xx_dab_digrad_status(): ");
 	timeout = 10;
 	while(--timeout){
-		si46xx_read(buf,4);
-		if(buf[0] & 0x01)
-			break;
-		msleep(100);
-	}
-	while(--timeout){
 		si46xx_write_data(SI46XX_DAB_DIGRAD_STATUS,&data,1);
 		si46xx_read(buf,22);
 		if(buf[0] & 0x81)
@@ -562,10 +587,15 @@ void si46xx_dab_scan()
 	for(i=0;i<dab_num_channels;i++){
 		si46xx_dab_tune_freq(i,0);
 		si46xx_dab_digrad_status(&status);
-		printf("Channel %d: ACQ: %d RSSI: %d SNR: %d\r\n", i,
+		printf("Channel %d: ACQ: %d RSSI: %d SNR: %d ", i,
 								   status.acq,
 								   status.rssi,
 								   status.snr);
+		if(status.acq){
+			msleep(1000);
+			si46xx_dab_get_ensemble_info();
+		};
+		printf("\r\n");
 	}
 }
 

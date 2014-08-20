@@ -42,6 +42,7 @@
 #define SI46XX_DAB_SET_FREQ_LIST 0xB8
 #define SI46XX_DAB_GET_DIGITAL_SERVICE_LIST 0x80
 #define SI46XX_DAB_START_DIGITAL_SERVICE 0x81
+#define SI46XX_DAB_GET_ENSEMBLE_INFO 0xB4
 
 #define SI46XX_FM_INT_CTL_ENABLE 0x0000
 #define SI46XX_FM_INT_CTL_REPEAT 0x0001
@@ -169,6 +170,7 @@ void si46xx_dab_get_service_linking_info(uint32_t service_id);
 void si46xx_dab_start_digital_service(uint32_t service_id, uint32_t comp_id);
 void si46xx_dab_print_service_list(void);
 void si46xx_dab_start_digital_service_num(uint32_t num);
+void si46xx_dab_get_ensemble_info(void);
 
 void si46xx_dab_scan();
 
