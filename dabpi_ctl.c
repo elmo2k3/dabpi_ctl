@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include "si46xx.h"
+#include "version.h"
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof((x)[0]))
 
@@ -211,6 +212,8 @@ int main(int argc, char **argv)
 	int frequency;
 	int tmp;
 	struct dab_digrad_status_t dab_digrad_status;
+
+	printf("dabpi_ctl version %s\r\n",GIT_VERSION);
 
 	si46xx_init();
 	while((c=getopt(argc, argv, "abc:def:ghi:j:k:")) != -1){

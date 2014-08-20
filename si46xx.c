@@ -452,7 +452,7 @@ static void si46xx_powerup()
 	char buf[4];
 
 	data[0] = 0x80; // ARG1
-	data[1] = (1<<4) | (7<<0); // ARG2 CLK_MODE=0x1 TR_SIZE=0x5
+	data[1] = (1<<4) | (7<<0); // ARG2 CLK_MODE=0x1 TR_SIZE=0x7
 	//data[2] = 0x28; // ARG3 IBIAS=0x28
 	data[2] = 0x48; // ARG3 IBIAS=0x28
 	data[3] = 0x00; // ARG4 XTAL
