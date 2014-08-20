@@ -53,17 +53,17 @@ pi@raspberrypi ~/dabpi_ctl $
 Run dabpi_ctl:
 
 ```bash
-[bjoern@x200 user_program]$ ./dabpi_ctl 
+[bjoern@x200 user_program]$ ./dabpi_ctl
 usage: ./dabpi_ctl [-a|-b]
   -a             init DAB mode
   -b             init fm mode
   -c frequency   tune frequency in FM mode
   -d             fm status
   -e             dab status
-  -f num         start service num of dab service list
+  -f service     start service num of dab service list
   -g             get dab service list
-  -i             tune to num in dab frequency list
-  -j num         set frequency list
+  -i channel     tune to num in dab frequency list
+  -j region      set frequency list
                     0   Baden-Wuertemberg
                     1   Bayern
                     2   Berlin-Brandenburg
@@ -79,7 +79,7 @@ usage: ./dabpi_ctl [-a|-b]
                     12  Sachsen-Anhalt
                     13  Schleswig-Holstein
                     14  Thueringen
-  -k num         scan frequency list (num is region like -j)
+  -k region      scan frequency list (num is region like -j)
   -h             this help
 ```
 ### Examples
