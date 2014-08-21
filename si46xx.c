@@ -372,6 +372,25 @@ void si46xx_fm_tune_freq(uint32_t khz, uint16_t antcap)
 	print_hex_str(buf,4);
 }
 
+void si46xx_fm_seek_start(uint8_t up, uint8_t wrap)
+{
+	uint8_t data[5];
+	char buf[4];
+
+	printf("si46xx_fm_seek_start()\r\n");
+
+	data[0] = 0;
+	data[1] = (up&0x01)<<1 | (wrap&0x01);
+	data[2] = 0;
+	data[3] = 0;
+	data[4] = 0;
+	si46xx_write_data(SI46XX_FM_SEEK_START,data,5);
+
+	si46xx_read(buf,4);
+	print_hex_str(buf,4);
+}
+
+
 static void si46xx_load_init()
 {
 	uint8_t data = 0;
@@ -494,6 +513,7 @@ void si46xx_fm_rsq_status()
 	print_hex_str(buf,20);
 	printf("SNR: %d dB\r\n",(int8_t)buf[10]);
 	printf("RSSI: %d dBuV\r\n",(int8_t)buf[9]);
+	printf("Frequency: %dkHz\r\n",(buf[7]<<8 | buf[6])*10);
 	printf("FREQOFF: %d\r\n",(int8_t)buf[8]*2);
 	printf("READANTCAP: %d\r\n",(int8_t)(buf[12]+(buf[13]<<8)));
 }

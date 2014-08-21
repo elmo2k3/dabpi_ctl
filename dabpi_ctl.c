@@ -25,18 +25,6 @@
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof((x)[0]))
 
-void tune_fm(void)
-{
-	si46xx_init_fm();
-	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003);
-	si46xx_set_property(SI46XX_FM_VALID_RSSI_THRESHOLD,0x0000);
-	si46xx_set_property(SI46XX_FM_VALID_SNR_THRESHOLD,0x0000);
-	si46xx_set_property(SI46XX_FM_SOFTMUTE_SNR_LIMITS,0x0000);
-	si46xx_set_property(SI46XX_FM_TUNE_FE_CFG,0x0000); // switch open
-	si46xx_set_property(SI46XX_DIGITAL_IO_OUTPUT_FORMAT,0x1000); // SAMPL_SIZE = 16
-	si46xx_fm_tune_freq(98500,0);
-}
-
 uint32_t frequency_list_nrw[] = {	CHAN_5C,
 					CHAN_11D};
 uint32_t frequency_list_by[] = {	CHAN_5C,
@@ -87,7 +75,20 @@ uint32_t frequency_list_th[] = {	CHAN_5C,
 					CHAN_7B,
 					CHAN_9C,
 					CHAN_12B};
-void tune_dab(void)
+
+void init_fm(void)
+{
+	si46xx_init_fm();
+	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003);
+	//si46xx_set_property(SI46XX_FM_VALID_RSSI_THRESHOLD,0x0000);
+	//si46xx_set_property(SI46XX_FM_VALID_SNR_THRESHOLD,0x0000);
+	si46xx_set_property(SI46XX_FM_SOFTMUTE_SNR_LIMITS,0x0000);
+	si46xx_set_property(SI46XX_FM_TUNE_FE_CFG,0x0000); // switch open
+	si46xx_set_property(SI46XX_DIGITAL_IO_OUTPUT_FORMAT,0x1000); // SAMPL_SIZE = 16
+	si46xx_set_property(SI46XX_FM_RDS_CONFIG, 0x0001);
+	si46xx_fm_tune_freq(98500,0);
+}
+void init_dab(void)
 {
 	si46xx_init_dab();
 	si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_nrw),frequency_list_nrw);
@@ -149,7 +150,8 @@ void show_help(char *prog_name)
 	printf("                    12  Sachsen-Anhalt\r\n");
 	printf("                    13  Schleswig-Holstein\r\n");
 	printf("                    14  Thueringen\r\n");
-	printf("  -k region      scan frequency list\n");
+	printf("  -k region      scan frequency list\r\n");
+	printf("  -l up|down     fm seek next station\r\n");
 	printf("  -h             this help\n");
 }
 
@@ -216,13 +218,13 @@ int main(int argc, char **argv)
 	printf("dabpi_ctl version %s\r\n",GIT_VERSION);
 
 	si46xx_init();
-	while((c=getopt(argc, argv, "abc:def:ghi:j:k:")) != -1){
+	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:")) != -1){
 		switch(c){
 		case 'a':
-			tune_dab();
+			init_dab();
 			break;
 		case 'b':
-			tune_fm();
+			init_fm();
 			break;
 		case 'c':
 			frequency = atoi(optarg);
@@ -258,6 +260,13 @@ int main(int argc, char **argv)
 			tmp = atoi(optarg);
 			load_regional_channel_list(tmp);
 			si46xx_dab_scan();
+			break;
+		case 'l':
+			if(strcmp(optarg,"down") == 0){
+				si46xx_fm_seek_start(0,1);
+			}else{
+				si46xx_fm_seek_start(1,1);
+			}
 			break;
 		default:
 			show_help(argv[0]);

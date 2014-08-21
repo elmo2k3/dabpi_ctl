@@ -80,6 +80,7 @@ usage: ./dabpi_ctl [-a|-b]
                     13  Schleswig-Holstein
                     14  Thueringen
   -k region      scan frequency list
+  -l up|down     fm seek next station
   -h             this help
 ```
 ### Examples
