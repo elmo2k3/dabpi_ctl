@@ -139,7 +139,8 @@ static void si46xx_get_sys_state()
 	print_hex_str(buf,6);
 }
 
-static void si46xx_get_part_info(){
+static void si46xx_get_part_info()
+{
 	uint8_t zero = 0;
 	char buf[22];
 
@@ -294,6 +295,18 @@ int si46xx_dab_get_digital_service_list()
 	}
 	si46xx_dab_parse_service_list(buf,len);
 	return len;
+}
+
+void si46xx_dab_get_audio_info()
+{
+	uint8_t zero = 0;
+	char buf[9];
+
+	printf("si46xx_dab_get_audio_info()\r\n");
+	si46xx_write_data(SI46XX_DAB_GET_AUDIO_INFO,&zero,1);
+	si46xx_read(buf,9);
+	printf("Bit rate: %dkbps\r\n",buf[4] + (buf[5]<<8));
+	printf("Sample rate: %dHz\r\n",buf[6] + (buf[7]<<8));
 }
 
 void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list)
@@ -518,16 +531,57 @@ void si46xx_fm_rsq_status()
 	printf("READANTCAP: %d\r\n",(int8_t)(buf[12]+(buf[13]<<8)));
 }
 
+void si46xx_fm_rds_blockcount()
+{
+	//uint8_t data = 1; // clears block counts if set
+	uint8_t data = 0; // clears block counts if set
+	char buf[10];
+
+	printf("si46xx_rds_blockcount()\r\n");
+	si46xx_write_data(SI46XX_FM_RDS_BLOCKCOUNT,&data,1);
+	si46xx_read(buf,10);
+	printf("Expected: %d\r\n",buf[4] | (buf[5]<<8));
+	printf("Received: %d\r\n",buf[6] | (buf[7]<<8));
+	printf("Uncorrectable: %d\r\n",buf[8] | (buf[9]<<8));
+}
+
 void si46xx_fm_rds_status()
 {
 	uint8_t data = 0;
 	char buf[20];
+	uint16_t timeout;
+	uint16_t block_a,block_b,block_c,block_d;
+	uint8_t group_count;
+	uint8_t addr;
+	char ps_name[9];
 
 	printf("si46xx_rds_status()\r\n");
-	si46xx_write_data(SI46XX_FM_RDS_STATUS,&data,1);
-	si46xx_read(buf,20);
-	print_hex_str(buf,20);
-	printf("RDSSYNC: %u\r\n",buf[5]&0x02);
+	timeout = 1000;
+	group_count = 0;
+	while(--timeout){
+		data = 1;
+		si46xx_write_data(SI46XX_FM_RDS_STATUS,&data,1);
+		si46xx_read(buf,20);
+		block_a = buf[12] + (buf[13]<<8);
+		block_b = buf[14] + (buf[15]<<8);
+		block_c = buf[16] + (buf[17]<<8);
+		block_d = buf[18] + (buf[19]<<8);
+		if((block_b & 0xF800) == 0x00){ // group 0A
+			addr = block_b & 0x03;
+			ps_name[addr*2] = (block_d & 0xFF00)>>8;
+			ps_name[addr*2+1] = block_d & 0xFF;
+			group_count |= (1<<addr);
+			if(group_count == 0x0F)
+				break;
+		}
+	}
+	if(!timeout)
+		printf("Timeout\r\n");
+	ps_name[8] = 0;
+	printf("RDSSYNC: %u\r\n",(buf[5]&0x02)?1:0);
+	printf("PI: %d  Name:%s\r\n",
+			block_a,
+			ps_name);
 }
 
 void si46xx_dab_get_service_linking_info(uint32_t service_id)
@@ -571,6 +625,7 @@ void si46xx_dab_digrad_status(struct dab_digrad_status_t *status)
 	printf("si46xx_dab_digrad_status(): ");
 	timeout = 10;
 	while(--timeout){
+		data = (1<<3) | 1; // set digrad_ack and stc_ack
 		si46xx_write_data(SI46XX_DAB_DIGRAD_STATUS,&data,1);
 		si46xx_read(buf,22);
 		if(buf[0] & 0x81)

@@ -35,6 +35,7 @@
 #define SI46XX_FM_RSQ_STATUS 0x32
 #define SI46XX_FM_ACF_STATUS 0x33
 #define SI46XX_FM_RDS_STATUS 0x34
+#define SI46XX_FM_RDS_BLOCKCOUNT 0x35
 
 #define SI46XX_DAB_TUNE_FREQ 0xB0
 #define SI46XX_DAB_DIGRAD_STATUS 0xB2
@@ -43,6 +44,7 @@
 #define SI46XX_DAB_GET_DIGITAL_SERVICE_LIST 0x80
 #define SI46XX_DAB_START_DIGITAL_SERVICE 0x81
 #define SI46XX_DAB_GET_ENSEMBLE_INFO 0xB4
+#define SI46XX_DAB_GET_AUDIO_INFO 0xBD
 
 #define SI46XX_FM_INT_CTL_ENABLE 0x0000
 #define SI46XX_FM_INT_CTL_REPEAT 0x0001
@@ -160,6 +162,7 @@ void si46xx_fm_tune_freq(uint32_t khz, uint16_t antcap);
 void si46xx_set_property(uint16_t property_id, uint16_t data);
 void si46xx_fm_rsq_status(void);
 void si46xx_fm_rds_status(void);
+void si46xx_fm_rds_blockcount(void);
 
 void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list);
 void si46xx_dab_tune_freq(uint8_t index, uint8_t antcap);
@@ -171,6 +174,7 @@ void si46xx_dab_start_digital_service(uint32_t service_id, uint32_t comp_id);
 void si46xx_dab_print_service_list(void);
 void si46xx_dab_start_digital_service_num(uint32_t num);
 void si46xx_dab_get_ensemble_info(void);
+void si46xx_dab_get_audio_info(void);
 
 void si46xx_dab_scan();
 

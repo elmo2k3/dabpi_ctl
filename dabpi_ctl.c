@@ -152,6 +152,8 @@ void show_help(char *prog_name)
 	printf("                    14  Thueringen\r\n");
 	printf("  -k region      scan frequency list\r\n");
 	printf("  -l up|down     fm seek next station\r\n");
+	printf("  -m             fm rds status\r\n");
+	printf("  -n             dab get audio info\r\n");
 	printf("  -h             this help\n");
 }
 
@@ -218,7 +220,7 @@ int main(int argc, char **argv)
 	printf("dabpi_ctl version %s\r\n",GIT_VERSION);
 
 	si46xx_init();
-	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:")) != -1){
+	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:mn")) != -1){
 		switch(c){
 		case 'a':
 			init_dab();
@@ -267,6 +269,13 @@ int main(int argc, char **argv)
 			}else{
 				si46xx_fm_seek_start(1,1);
 			}
+			break;
+		case 'm':
+			si46xx_fm_rds_status();
+			si46xx_fm_rds_blockcount();
+			break;
+		case 'n':
+			si46xx_dab_get_audio_info();
 			break;
 		default:
 			show_help(argv[0]);
