@@ -179,6 +179,34 @@ void si46xx_dab_start_digital_service(uint32_t service_id,
 	si46xx_read(buf,5);
 }
 
+static si46xx_swap_services(uint8_t first, uint8_t second)
+{
+	struct dab_service_t tmp;
+
+	memcpy(&tmp,&dab_service_list.services[first],sizeof(tmp));
+	memcpy(&dab_service_list.services[first],
+	       &dab_service_list.services[second] ,sizeof(tmp));
+	memcpy(&dab_service_list.services[second],&tmp ,sizeof(tmp));
+}
+
+static si46xx_sort_service_list(void)
+{
+	uint8_t i,p,swapped;
+
+	swapped = 0;
+	for(i=dab_service_list.num_services;i>1;i--){
+		for(p=0;p<i-1;p++){
+			if(dab_service_list.services[p].service_id >
+			   dab_service_list.services[p+1].service_id){
+				si46xx_swap_services(p,p+1);
+				swapped = 1;
+			}
+		}
+		if(!swapped)
+			break;
+	}
+}
+
 static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
 {
 	uint16_t remaining_bytes;
@@ -223,6 +251,7 @@ static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
 		pos +=24;
 		service_num++;
 	}
+	si46xx_sort_service_list();
 }
 
 void si46xx_dab_get_ensemble_info()

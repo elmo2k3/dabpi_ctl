@@ -113,7 +113,7 @@
 #define MAX_SERVICES 32
 #define MAX_COMPONENTS 15
 
-struct dab_service{
+struct dab_service_t{
 	uint32_t service_id;
 	uint8_t service_info1;
 	uint8_t service_info2;
@@ -162,7 +162,7 @@ struct dab_service_list_t{
 	uint16_t list_size;
 	uint16_t version;
 	uint8_t num_services;
-	struct dab_service services[MAX_SERVICES];
+	struct dab_service_t services[MAX_SERVICES];
 }dab_service_list;
 
 void si46xx_init(void);
