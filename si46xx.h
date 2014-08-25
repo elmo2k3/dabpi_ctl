@@ -148,7 +148,17 @@ struct dab_digrad_status_t{
 	uint16_t cu_level; // 0-470
 };
 
-struct _dab_service_list{
+struct fm_rds_data_t{
+	uint8_t sync;
+	uint16_t pi;
+	uint8_t pty;
+	char ps_name[9];
+	char radiotext[129];
+	uint16_t group_0a_flags;
+	uint32_t group_2a_flags;
+}fm_rds_data;
+
+struct dab_service_list_t{
 	uint16_t list_size;
 	uint16_t version;
 	uint8_t num_services;

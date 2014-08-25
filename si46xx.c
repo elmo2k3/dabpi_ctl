@@ -545,43 +545,84 @@ void si46xx_fm_rds_blockcount()
 	printf("Uncorrectable: %d\r\n",buf[8] | (buf[9]<<8));
 }
 
+static uint8_t si46xx_rds_parse(uint16_t *block)
+{
+	uint8_t addr;
+	fm_rds_data.pi = block[0];
+	if((block[1] & 0xF800) == 0x00){ // group 0A
+		addr = block[1] & 0x03;
+		fm_rds_data.ps_name[addr*2] = (block[3] & 0xFF00)>>8;
+		fm_rds_data.ps_name[addr*2+1] = block[3] & 0xFF;
+		fm_rds_data.group_0a_flags |= (1<<addr);
+	}else if((block[1] & 0xF800)>>11 == 0x04){ // group 2A
+		addr = block[1] & 0x0F;
+		if((block[1] & 0x10) == 0x00){ // parse only string A
+			fm_rds_data.radiotext[addr*4] = (block[2] & 0xFF00)>>8;
+			fm_rds_data.radiotext[addr*4+1] = (block[2] & 0xFF);
+			fm_rds_data.radiotext[addr*4+2] = (block[3] & 0xFF00)>>8;
+			fm_rds_data.radiotext[addr*4+3] = (block[3] & 0xFF);
+
+			if(fm_rds_data.radiotext[addr*4] == '\r'){
+				fm_rds_data.radiotext[addr*4] = 0;
+				fm_rds_data.group_2a_flags = 0xFFFF;
+			}
+			if(fm_rds_data.radiotext[addr*4+1] == '\r'){
+				fm_rds_data.radiotext[addr*4+1] = 0;
+				fm_rds_data.group_2a_flags = 0xFFFF;
+			}
+			if(fm_rds_data.radiotext[addr*4+2] == '\r'){
+				fm_rds_data.radiotext[addr*4+2] = 0;
+				fm_rds_data.group_2a_flags = 0xFFFF;
+			}
+			if(fm_rds_data.radiotext[addr*4+3] == '\r'){
+				fm_rds_data.radiotext[addr*4+3] = 0;
+				fm_rds_data.group_2a_flags = 0xFFFF;
+			}
+			fm_rds_data.group_2a_flags |= (1<<addr);
+		}
+	}
+	if(fm_rds_data.group_0a_flags == 0x0F &&
+		fm_rds_data.group_2a_flags == 0xFFFF){
+		fm_rds_data.ps_name[8] = 0;
+		fm_rds_data.radiotext[128] = 0;
+		return 1;
+	}
+	return 0;
+}
+
+
 void si46xx_fm_rds_status()
 {
 	uint8_t data = 0;
 	char buf[20];
 	uint16_t timeout;
-	uint16_t block_a,block_b,block_c,block_d;
-	uint8_t group_count;
-	uint8_t addr;
-	char ps_name[9];
+	uint16_t blocks[4];
 
 	printf("si46xx_rds_status()\r\n");
-	timeout = 1000;
-	group_count = 0;
+	timeout = 5000; // work on 1000 rds blocks max
 	while(--timeout){
 		data = 1;
 		si46xx_write_data(SI46XX_FM_RDS_STATUS,&data,1);
 		si46xx_read(buf,20);
-		block_a = buf[12] + (buf[13]<<8);
-		block_b = buf[14] + (buf[15]<<8);
-		block_c = buf[16] + (buf[17]<<8);
-		block_d = buf[18] + (buf[19]<<8);
-		if((block_b & 0xF800) == 0x00){ // group 0A
-			addr = block_b & 0x03;
-			ps_name[addr*2] = (block_d & 0xFF00)>>8;
-			ps_name[addr*2+1] = block_d & 0xFF;
-			group_count |= (1<<addr);
-			if(group_count == 0x0F)
-				break;
-		}
+		blocks[0] = buf[12] + (buf[13]<<8);
+		blocks[1] = buf[14] + (buf[15]<<8);
+		blocks[2] = buf[16] + (buf[17]<<8);
+		blocks[3] = buf[18] + (buf[19]<<8);
+		fm_rds_data.sync = (buf[5] & 0x02)?1:0;
+		if(!fm_rds_data.sync)
+			break;
+		if(si46xx_rds_parse(blocks))
+			break;
+		if(fm_rds_data.group_0a_flags == 0x0F) // stop at ps_name complete
+			break;
 	}
 	if(!timeout)
 		printf("Timeout\r\n");
-	ps_name[8] = 0;
 	printf("RDSSYNC: %u\r\n",(buf[5]&0x02)?1:0);
-	printf("PI: %d  Name:%s\r\n",
-			block_a,
-			ps_name);
+	printf("PI: %d  Name:%s\r\nRadiotext: %s\r\n",
+			fm_rds_data.pi,
+			fm_rds_data.ps_name,
+			fm_rds_data.radiotext);
 }
 
 void si46xx_dab_get_service_linking_info(uint32_t service_id)
@@ -622,7 +663,7 @@ void si46xx_dab_digrad_status(struct dab_digrad_status_t *status)
 	char buf[22];
 	uint8_t timeout = 100;
 
-	printf("si46xx_dab_digrad_status(): ");
+	printf("si46xx_dab_digrad_status():\r\n");
 	timeout = 10;
 	while(--timeout){
 		data = (1<<3) | 1; // set digrad_ack and stc_ack
