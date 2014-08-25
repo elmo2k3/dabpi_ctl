@@ -16,6 +16,15 @@ https://github.com/raspberrypi/linux or use the precompiled image. For the preco
 
 ## Install
 
+There is a very simple install script for a fresh raspian now (where there is nothing to be damaged).
+
+```bash
+wget https://github.com/elmo2k3/dabpi_ctl/raw/master/install_on_fresh_raspbian.sh
+./install_on_fresh_raspbian.sh
+```
+
+### Manual Install
+
 Get and compile the source code:
 
 ```bash
