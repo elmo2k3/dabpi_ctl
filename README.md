@@ -2,9 +2,13 @@
 
 ## Warning
 
+!!! Firmware files removed due to license issues !!!
+
 This project is pre-alpha. Most features are still missing.
 
 ## Requirements
+
+Get the firmware package for Si4688 from Silabs.
 
 Be sure to enable SPI in raspi-config.
 
