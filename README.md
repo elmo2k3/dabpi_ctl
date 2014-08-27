@@ -1,5 +1,8 @@
 # dabpi_ctl - RPi fm/fmhd/dab receiver control interface
 
+![Image of DABPi v1 PCB]
+(https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/dabpi_v1.jpg)
+
 ## Warning
 
 !!! Firmware files removed due to license issues !!!
