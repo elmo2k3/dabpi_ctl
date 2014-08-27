@@ -8,6 +8,10 @@ This project is pre-alpha. Most features are still missing.
 
 ## Requirements
 
+You need a RPi that has the option to mount the I2S extension header.
+![Image of RPi with soldered I2S extension header]
+(https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/IMG_0292.JPG)
+
 Get the firmware package for Si4688 from Silabs.
 
 Be sure to enable SPI in raspi-config.
@@ -96,6 +100,15 @@ usage: ./dabpi_ctl [-a|-b]
   -l up|down     fm seek next station
   -h             this help
 ```
+
+### Audio output
+
+To test audio output, redirect it from capture to playback device:
+
+```bash
+alsaloop -C hw:1,0
+```
+
 ### Examples
 
 Enter fm mode:
