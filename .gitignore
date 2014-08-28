@@ -3,3 +3,6 @@ dabpi_ctl
 Session.vim
 *.*.swp
 Tags
+firmware/
+firmware.zip
+tags

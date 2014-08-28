@@ -1,0 +1,2 @@
+- if audio transmission (aloop, arecord...) is stopped and started again, audio is broken. restart mode (dabpi_ctl -a or -b)
+- broken strings in DR Deutschland Ensemble
