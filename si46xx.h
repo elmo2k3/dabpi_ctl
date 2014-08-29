@@ -45,6 +45,7 @@
 #define SI46XX_DAB_START_DIGITAL_SERVICE 0x81
 #define SI46XX_DAB_GET_ENSEMBLE_INFO 0xB4
 #define SI46XX_DAB_GET_AUDIO_INFO 0xBD
+#define SI46XX_DAB_GET_SUBCHAN_INFO 0xBE
 
 #define SI46XX_FM_INT_CTL_ENABLE 0x0000
 #define SI46XX_FM_INT_CTL_REPEAT 0x0001
@@ -185,6 +186,8 @@ void si46xx_dab_print_service_list(void);
 void si46xx_dab_start_digital_service_num(uint32_t num);
 void si46xx_dab_get_ensemble_info(void);
 void si46xx_dab_get_audio_info(void);
+void si46xx_dab_get_subchannel_info(void);
+
 
 void si46xx_dab_scan();
 

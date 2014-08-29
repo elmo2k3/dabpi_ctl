@@ -101,6 +101,9 @@ usage: ./dabpi_ctl [-a|-b]
                     14  Thueringen
   -k region      scan frequency list
   -l up|down     fm seek next station
+  -m             fm rds status
+  -n             dab get audio info
+  -o             dab get subchannel info
   -h             this help
 ```
 

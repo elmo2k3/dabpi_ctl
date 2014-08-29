@@ -338,6 +338,85 @@ void si46xx_dab_get_audio_info()
 	printf("Sample rate: %dHz\r\n",buf[6] + (buf[7]<<8));
 }
 
+void si46xx_dab_get_subchannel_info()
+{
+	uint8_t zero = 0;
+	char buf[12];
+	printf("si46xx_dab_get_subchannel_info()\r\n");
+	si46xx_write_data(SI46XX_DAB_GET_SUBCHAN_INFO,&zero,1);
+	si46xx_read(buf,12);
+	if(buf[4] == 0) {
+		printf("Service Mode = Audio Stream Service\r\n");
+	}
+	if(buf[4] == 1) {
+		printf("Service Mode = Data Stream Service\r\n");
+	}
+	if(buf[4] == 2) {
+		printf("Service Mode = FIDC Service\r\n");
+	}
+	if(buf[4] == 3) {
+		printf("Service Mode = MSC Data Packet Service\r\n");
+	}
+	if(buf[4] == 4) {
+		printf("Service Mode = DAB+\r\n");
+	}
+	if(buf[4] == 5) {
+		printf("Service Mode = DAB\r\n");
+	}
+	if(buf[4] == 6) {
+		printf("Service Mode = FIC Service\r\n");
+	}
+	if(buf[4] == 7) {
+		printf("Service Mode = XPAD Data\r\n");
+	}
+	if(buf[4] == 8) {
+		printf("Service Mode = No Media\r\n");
+	}
+	if(buf[5] == 1) {
+		printf("Protection Mode UEP-1\r\n");
+	}
+	if(buf[5] == 2) {
+		printf("Protection Mode UEP-2\r\n");
+	}
+	if(buf[5] == 3) {
+		printf("Protection Mode UEP-3\r\n");
+	}
+	if(buf[5] == 4) {
+		printf("Protection Mode UEP-4\r\n");
+	}
+	if(buf[5] == 5) {
+		printf("Protection Mode UEP-5\r\n");
+	}
+	if(buf[5] == 6) {
+		printf("Protection Mode EEP-1A\r\n");
+	}
+	if(buf[5] == 7) {
+		printf("Protection Mode EEP-2A\r\n");
+	}
+	if(buf[5] == 8) {
+		printf("Protection Mode EEP-3A\r\n");
+	}
+	if(buf[5] == 9) {
+		printf("Protection Mode EEP-4A\r\n");
+	}
+	if(buf[5] == 10) {
+		printf("Protection Mode EEP-1B\r\n");
+	}
+	if(buf[5] == 11) {
+		printf("Protection Mode EEP-2B\r\n");
+	}
+	if(buf[5] == 12) {
+		printf("Protection Mode EEP-3B\r\n");
+	}
+	if(buf[5] == 13) {
+		printf("Protection Mode EEP-4B\r\n");
+	}
+	printf("Subchannel Bitrate: %dkbps\r\n",buf[6] + (buf[7]<<8));
+	printf("Capacity Units: %d CU\r\n",buf[8] + (buf[9]<<8));
+	printf("CU Starting Adress: %d\r\n",buf[10] + (buf[11]<<8));
+}
+
+
 void si46xx_dab_set_freq_list(uint8_t num, uint32_t *freq_list)
 {
 	uint8_t data[3+4*48]; // max 48 frequencies
