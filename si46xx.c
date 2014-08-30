@@ -61,8 +61,8 @@ void print_hex_str(uint8_t *str, uint16_t len)
 }
 
 static void si46xx_write_host_load_data(uint8_t cmd,
-					const uint8_t *data,
-					uint16_t len)
+		const uint8_t *data,
+		uint16_t len)
 {
 
 	uint8_t zero_data[3];
@@ -80,18 +80,26 @@ static void si46xx_write_host_load_data(uint8_t cmd,
 static void si46xx_read(uint8_t *data, uint8_t cnt)
 {
 	uint8_t zero = 0;
-	CS_HIGH();
-	msleep(1); // make sure cs is high for 20us
-	CS_LOW();
-	SPI_Write(&zero,1);
-	SPI_Write(data,cnt);
-	CS_HIGH();
-	msleep(1); // make sure cs is high for 20us
+	uint8_t timeout;
+
+	timeout = 100; // wait for CTS
+	while(--timeout){
+		CS_HIGH();
+		msleep(1); // make sure cs is high for 20us
+		CS_LOW();
+		zero = 0;
+		SPI_Write(&zero,1);
+		SPI_Write(data,cnt);
+		CS_HIGH();
+		msleep(1); // make sure cs is high for 20us
+		if(data[0] & 0x80)
+			break;
+	}
 }
 
 static void si46xx_write_data(uint8_t cmd,
-				uint8_t *data,
-				uint16_t len)
+		uint8_t *data,
+		uint16_t len)
 {
 	uint8_t timeout;
 	uint8_t buf[4];
@@ -158,7 +166,7 @@ void si46xx_periodic()
 
 
 void si46xx_dab_start_digital_service(uint32_t service_id,
-				      uint32_t comp_id)
+		uint32_t comp_id)
 {
 	uint8_t data[11];
 	char buf[5];
@@ -185,7 +193,7 @@ static si46xx_swap_services(uint8_t first, uint8_t second)
 
 	memcpy(&tmp,&dab_service_list.services[first],sizeof(tmp));
 	memcpy(&dab_service_list.services[first],
-	       &dab_service_list.services[second] ,sizeof(tmp));
+			&dab_service_list.services[second] ,sizeof(tmp));
 	memcpy(&dab_service_list.services[second],&tmp ,sizeof(tmp));
 }
 
@@ -197,7 +205,7 @@ static si46xx_sort_service_list(void)
 	for(i=dab_service_list.num_services;i>1;i--){
 		for(p=0;p<i-1;p++){
 			if(dab_service_list.services[p].service_id >
-			   dab_service_list.services[p+1].service_id){
+					dab_service_list.services[p+1].service_id){
 				si46xx_swap_services(p,p+1);
 				swapped = 1;
 			}
@@ -240,7 +248,7 @@ static void si46xx_dab_parse_service_list(uint8_t *data, uint16_t len)
 		component_num = data[pos+5] & 0x0F;
 		dab_service_list.services[service_num].num_components = component_num;
 		memcpy(dab_service_list.services[service_num].service_label,
-			&data[pos+8],16);
+				&data[pos+8],16);
 		dab_service_list.services[service_num].service_label[16] = '\0';
 		for(i=0;i<component_num;i++){
 			dab_service_list.services[service_num].component_id[i] =
@@ -286,15 +294,15 @@ void si46xx_dab_print_service_list()
 
 	for(i=0;i<dab_service_list.num_services;i++){
 		printf("Num: %2u  Service ID: %8x  Service Name: %s  Component ID: %d\r\n",
-			i,
-			dab_service_list.services[i].service_id,
-			dab_service_list.services[i].service_label,
-			dab_service_list.services[i].component_id[0]
-		);
+				i,
+				dab_service_list.services[i].service_id,
+				dab_service_list.services[i].service_label,
+				dab_service_list.services[i].component_id[0]
+		      );
 		for(p=0;p<dab_service_list.services[i].num_components;p++){
 			printf("                                                               Component ID: %d\r\n",
-				dab_service_list.services[i].component_id[i]
-			);
+					dab_service_list.services[i].component_id[i]
+			      );
 		}
 	}
 }
@@ -302,8 +310,8 @@ void si46xx_dab_print_service_list()
 void si46xx_dab_start_digital_service_num(uint32_t num)
 {
 	printf("Starting service %s %x %x\r\n", dab_service_list.services[num].service_label,
-						dab_service_list.services[num].service_id,
-						dab_service_list.services[num].component_id[0]);
+			dab_service_list.services[num].service_id,
+			dab_service_list.services[num].component_id[0]);
 	si46xx_dab_start_digital_service(dab_service_list.services[num].service_id,
 			dab_service_list.services[num].component_id[0]);
 }
@@ -334,8 +342,23 @@ void si46xx_dab_get_audio_info()
 	printf("si46xx_dab_get_audio_info()\r\n");
 	si46xx_write_data(SI46XX_DAB_GET_AUDIO_INFO,&zero,1);
 	si46xx_read(buf,9);
+	print_hex_str(buf,9);
 	printf("Bit rate: %dkbps\r\n",buf[4] + (buf[5]<<8));
 	printf("Sample rate: %dHz\r\n",buf[6] + (buf[7]<<8));
+	if((buf[8]& 0x03) == 0) {
+		printf("Audio Mode = Dual Mono\r\n");
+	}
+	if((buf[8]& 0x03) == 1) {
+		printf("Audio Mode = Mono\r\n");
+	}
+	if((buf[8]& 0x03) == 2) {
+		printf("Audio Mode = Stereo\r\n");
+	}
+	if((buf[8]& 0x03) == 3) {
+		printf("Audio Mode = Joint Stereo\r\n");
+	}
+	printf("SBR: %d\r\n", (buf[8] & 0x04) ? 1:0);
+	printf("PS: %d\r\n", (buf[8] & 0x08) ? 1:0);
 }
 
 void si46xx_dab_get_subchannel_info()
@@ -690,7 +713,7 @@ static uint8_t si46xx_rds_parse(uint16_t *block)
 		}
 	}
 	if(fm_rds_data.group_0a_flags == 0x0F &&
-		fm_rds_data.group_2a_flags == 0xFFFF){
+			fm_rds_data.group_2a_flags == 0xFFFF){
 		fm_rds_data.ps_name[8] = 0;
 		fm_rds_data.radiotext[128] = 0;
 		return 1;
@@ -795,9 +818,9 @@ void si46xx_dab_digrad_status(struct dab_digrad_status_t *status)
 	status->cnr = buf[9];
 	status->fft_offset = (int8_t)buf[17];
 	status->frequency = buf[12] |
-			    buf[13]<<8 |
-			    buf[14]<<16 |
-			    buf[15]<<24;
+		buf[13]<<8 |
+		buf[14]<<16 |
+		buf[15]<<24;
 	status->tuned_index = buf[16];
 	status->read_ant_cap = buf[18] | buf[19]<<8;
 
@@ -812,9 +835,9 @@ void si46xx_dab_scan()
 		si46xx_dab_tune_freq(i,0);
 		si46xx_dab_digrad_status(&status);
 		printf("Channel %d: ACQ: %d RSSI: %d SNR: %d ", i,
-								   status.acq,
-								   status.rssi,
-								   status.snr);
+				status.acq,
+				status.rssi,
+				status.snr);
 		if(status.acq){
 			msleep(1000);
 			si46xx_dab_get_ensemble_info();
