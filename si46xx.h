@@ -61,15 +61,20 @@
 #define SI46XX_FM_SOFTMUTE_SNR_ATTENUATION 0x3501
 #define SI46XX_FM_TUNE_FE_CFG 0x1712
 #define SI46XX_FM_RDS_CONFIG 0x3C02
+#define SI46XX_FM_AUDIO_DE_EMPHASIS 0x3900
+
 #define SI46XX_DAB_TUNE_FE_CFG 0x1712
 #define SI46XX_DAB_TUNE_FE_VARM 0x1710
 #define SI46XX_DAB_TUNE_FE_VARB 0x1711
-
 #define SI46XX_DAB_CTRL_DAB_MUTE_ENABLE 0xB400
 #define SI46XX_DAB_CTRL_DAB_MUTE_SIGNAL_LEVEL_THRESHOLD 0xB501
 #define SI46XX_DAB_CTRL_DAB_MUTE_SIGLOW_THRESHOLD 0xB505
 
 #define SI46XX_DIGITAL_SERVICE_INT_SOURCE 0x8100
+
+#define SI46XX_AUDIO_DE_EMPHASIS_EU 0x01 //0x00=75us -> defaults to USA (default), 0x01=50us -> defaults to Europe, 0x02=disabled
+#define SI46XX_AUDIO_DE_EMPHASIS_US 0x00 //0x00=75us -> defaults to USA (default), 0x01=50us -> defaults to Europe, 0x02=disabled
+#define SI46XX_AUDIO_DE_EMPHASIS_OFF 0x02 //0x00=75us -> defaults to USA (default), 0x01=50us -> defaults to Europe, 0x02=disabled
 
 // DAB channels
 #define CHAN_5A 174928

@@ -75,18 +75,25 @@ uint32_t frequency_list_th[] = {	CHAN_5C,
 					CHAN_7B,
 					CHAN_9C,
 					CHAN_12B};
+uint32_t frequency_list_it_sue[] = {	CHAN_10B,
+					CHAN_10C,
+					CHAN_10D,
+					CHAN_12A,
+					CHAN_12B,
+					CHAN_12C};
 
 void init_fm(void)
 {
 	si46xx_init_fm();
-	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003);
+	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003); // enable I2S output
 	//si46xx_set_property(SI46XX_FM_VALID_RSSI_THRESHOLD,0x0000);
 	//si46xx_set_property(SI46XX_FM_VALID_SNR_THRESHOLD,0x0000);
-	si46xx_set_property(SI46XX_FM_SOFTMUTE_SNR_LIMITS,0x0000);
-	si46xx_set_property(SI46XX_FM_TUNE_FE_CFG,0x0000); // switch open
-	si46xx_set_property(SI46XX_DIGITAL_IO_OUTPUT_FORMAT,0x1000); // SAMPL_SIZE = 16
-	si46xx_set_property(SI46XX_FM_RDS_CONFIG, 0x0001);
-	si46xx_fm_tune_freq(98500,0);
+	si46xx_set_property(SI46XX_FM_SOFTMUTE_SNR_LIMITS,0x0000); // set the SNR limits for soft mute attenuation
+	si46xx_set_property(SI46XX_FM_TUNE_FE_CFG,0x0000); // front end switch open
+	si46xx_set_property(SI46XX_DIGITAL_IO_OUTPUT_FORMAT,0x1000); // SAMPL_SIZE = 16, I2S mode
+	si46xx_set_property(SI46XX_FM_RDS_CONFIG, 0x0001); // enable RDS
+	si46xx_set_property(SI46XX_FM_AUDIO_DE_EMPHASIS, SI46XX_AUDIO_DE_EMPHASIS_EU); // set de-emphasis for Europe
+	si46xx_fm_tune_freq(105500,0);
 }
 void init_dab(void)
 {
@@ -95,11 +102,11 @@ void init_dab(void)
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_SIGNAL_LEVEL_THRESHOLD,0);
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_SIGLOW_THRESHOLD,0);
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_ENABLE,0);
-	si46xx_set_property(SI46XX_DIGITAL_SERVICE_INT_SOURCE,1);
-	si46xx_set_property(SI46XX_DAB_TUNE_FE_CFG,0x0001); // switch closed
-	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARM,10);
-	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARB,10);
-	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003);
+	si46xx_set_property(SI46XX_DIGITAL_SERVICE_INT_SOURCE,1); // enable DSRVPAKTINT interrupt ??
+	si46xx_set_property(SI46XX_DAB_TUNE_FE_CFG,0x0001); // front end switch closed
+	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARM,10); // Front End Varactor configuration
+	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARB,10); // Front End Varactor configuration
+	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003); // enable I2S output
 	si46xx_dab_tune_freq(0,0);
 }
 
@@ -150,6 +157,7 @@ void show_help(char *prog_name)
 	printf("                    12  Sachsen-Anhalt\r\n");
 	printf("                    13  Schleswig-Holstein\r\n");
 	printf("                    14  Thueringen\r\n");
+	printf("                    15  Suedtirol (Italien)\r\n");
 	printf("  -k region      scan frequency list\r\n");
 	printf("  -l up|down     fm seek next station\r\n");
 	printf("  -m             fm rds status\r\n");
@@ -205,6 +213,9 @@ void load_regional_channel_list(uint8_t tmp)
 	}else if(tmp == 14){
 		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_th),
 					frequency_list_th);
+	}else if(tmp == 15){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_it_sue),
+					frequency_list_it_sue);
 	}else{
 		printf("Region %d not implemented\r\n",tmp);
 	}
