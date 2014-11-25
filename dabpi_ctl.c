@@ -97,8 +97,8 @@ void init_dab(void)
 	si46xx_set_property(SI46XX_DAB_CTRL_DAB_MUTE_ENABLE,0);
 	si46xx_set_property(SI46XX_DIGITAL_SERVICE_INT_SOURCE,1);
 	si46xx_set_property(SI46XX_DAB_TUNE_FE_CFG,0x0001); // switch closed
-	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARM,10);
-	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARB,10);
+	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARM,0x1710);
+	si46xx_set_property(SI46XX_DAB_TUNE_FE_VARB,0x1711);
 	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003);
 	si46xx_dab_tune_freq(0,0);
 }
