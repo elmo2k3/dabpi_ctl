@@ -36,7 +36,6 @@
 
 #define SPI_Write(data,len) wiringPiSPIDataRW(0,data,len)
 #else
-
 #define CS_LOW()
 #define CS_HIGH()
 #define RESET_LOW()
