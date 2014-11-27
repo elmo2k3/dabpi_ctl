@@ -42,6 +42,7 @@
 #define RESET_HIGH()
 #define SPI_Write(data,len)
 #endif
+//
 //#define msleep(x) HAL_Delay(x)
 //#define SPI_Write(data,len) HAL_SPI_Transmit(&hspi1,data,len,1000)
 //#define CS_LOW() GPIOA->BSRRH = SI46XX_PIN_NSS
@@ -54,6 +55,7 @@ uint8_t dab_num_channels;
 void print_hex_str(uint8_t *str, uint16_t len)
 {
 	uint16_t i;
+	printf("0x");
 	for(i=0;i<len;i++){
 		printf("%02x",(int)str[i]);
 	}
@@ -88,8 +90,8 @@ static void si46xx_read(uint8_t *data, uint8_t cnt)
 		msleep(1); // make sure cs is high for 20us
 		CS_LOW();
 		zero = 0;
-		SPI_Write(&zero,1);
-		SPI_Write(data,cnt);
+		SPI_Write(&zero,1); // read status register (we are working without interrupts)
+		SPI_Write(data,cnt); // read data
 		CS_HIGH();
 		msleep(1); // make sure cs is high for 20us
 		if(data[0] & 0x80)
@@ -539,7 +541,7 @@ static void si46xx_load_init()
 {
 	uint8_t data = 0;
 	si46xx_write_data(SI46XX_LOAD_INIT,&data,1);
-	msleep(1); // wait 4ms (datasheet)
+	msleep(4); // wait 4ms (datasheet)
 }
 
 static void store_image(const uint8_t *data, uint32_t len, uint8_t wait_for_int)
@@ -851,7 +853,8 @@ void si46xx_set_property(uint16_t property_id, uint16_t value)
 	uint8_t data[5];
 	char buf[4];
 
-	printf("si46xx_set_property(%d,%d)\r\n",property_id,value);
+	printf("si46xx_set_property(0x%02X,0x%02X)\r\n",property_id,value);
+	
 	data[0] = 0;
 	data[1] = property_id & 0xFF;
 	data[2] = (property_id >> 8) & 0xFF;
