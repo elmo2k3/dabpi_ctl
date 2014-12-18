@@ -11,7 +11,8 @@ This project is pre-alpha. Most features are still missing.
 
 ## Requirements
 
-You need a RPi that has the option to mount the I2S extension header.
+You need a RPi that has the option to mount the I2S extension header. Currently
+there is no support for the A+/B+ versions.
 ![Image of RPi with soldered I2S extension header]
 (https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/IMG_0292.JPG)
 
@@ -31,6 +32,7 @@ There is a very simple install script for a fresh raspian now (where there is no
 
 ```bash
 wget https://github.com/elmo2k3/dabpi_ctl/raw/master/install_on_fresh_raspbian.sh
+chmod a+x install_on_fresh_raspbian.sh
 ./install_on_fresh_raspbian.sh
 ```
 
