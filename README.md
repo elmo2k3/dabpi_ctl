@@ -11,8 +11,7 @@ This project is pre-alpha. Most features are still missing.
 
 ## Requirements
 
-You need a RPi that has the option to mount the I2S extension header. Currently
-there is no support for the A+/B+ versions.
+You need a RPi that has the option to mount the I2S extension header.
 ![Image of RPi with soldered I2S extension header]
 (https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/IMG_0292.JPG)
 
@@ -25,6 +24,11 @@ Install wiringPi library. See http://wiringpi.com/download-and-install/
 To get the audio you need to install a new kernel. It can be compiled from here
 https://github.com/raspberrypi/linux or use the precompiled image. For the precompiled binarys, see the Install section.
 
+## RPi A+/B+ instructions
+![Image of RPi B+ with additional cables]
+(https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/a_b_plus.jpg)
+
+Connect P5 header pins 3,4,5 to GPIO header pins 12,35,38.
 
 ## Install
 
