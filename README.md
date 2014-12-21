@@ -39,6 +39,9 @@ wget https://github.com/elmo2k3/dabpi_ctl/raw/master/install_on_fresh_raspbian.s
 chmod a+x install_on_fresh_raspbian.sh
 ./install_on_fresh_raspbian.sh
 ```
+This will install the commandline tool to /home/pi/dabpi_ctl
+
+Unpack the firmware files (get it from silabs or ask me) into /home/pi/dabpi_ctl/firmware
 
 ### Manual Install
 
@@ -119,6 +122,11 @@ To test audio output, redirect it from capture to playback device:
 
 ```bash
 alsaloop -C hw:1,0
+```
+Stream audio to another linux machine over ssh:
+
+```bash
+ssh pi@PI-IP-ADDRESS 'arecord -D hw:1,0 -f dat -' | aplay -f dat -
 ```
 
 ### Examples
