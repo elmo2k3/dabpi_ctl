@@ -5,8 +5,9 @@
 # 
 # Automatic install script for "dabpi_ctl - raspberry pi fm/fmhd/dab receiver board"
 # Copyright (C) 2014  Patrick De Zordo <patrick@spamreducer.eu>
+#                     Bjoern Biesenbach <bjoern@bjoern-b.de>
 #
-# Version: 0.1-beta
+# Version: 0.1.1-beta
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -59,7 +60,7 @@ sudo tar -C / -xvzf kernel/lib.tar.gz
 
 echo "Edit Raspberry drivers blacklist to allow SPI and I2C.."
 cp /etc/modprobe.d/raspi-blacklist.conf ~
-cat > /etc/modprobe.d/raspi-blacklist.conf <<EOF
+cat << EOF | sudo tee /etc/modprobe.d/raspi-blacklist.conf
 # blacklist spi and i2c by default (many users don't need them)
 
 #blacklist spi-bcm2708
@@ -69,7 +70,7 @@ EOF
 
 echo "Setup modules to load on boot.."
 cp /etc/modules ~
-cat > /etc/modules <<EOF
+cat << EOF | sudo tee /etc/modules
 # /etc/modules: kernel modules to load at boot time.
 #
 # This file contains the names of kernel modules that should be loaded
