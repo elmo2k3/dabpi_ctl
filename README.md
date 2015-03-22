@@ -22,7 +22,7 @@ Be sure to enable SPI in raspi-config.
 Install wiringPi library. See http://wiringpi.com/download-and-install/
 
 To get the audio you need to install a new kernel. It can be compiled from here
-https://github.com/raspberrypi/linux or use the precompiled image. For the precompiled binarys, see the Install section.
+https://github.com/elmo2k3/linux or use the precompiled image. For the precompiled binarys, see the Install section.
 
 ## RPi A+/B+ instructions
 ![Image of RPi B+ with additional cables]
