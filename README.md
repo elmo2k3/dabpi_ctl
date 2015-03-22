@@ -2,8 +2,10 @@
 
 ![Image of DABPi+ v11 PCB]
 (https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/dabpi+_v11.jpg)
+DABPi+ for Raspberry Pi A+/B+ versions. Pi2 not tested yet.
 ![Image of DABPi v1 PCB]
 (https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/dabpi_v1.jpg)
+DABPi for older Raspberry Pi A/B versions.
 
 ## Warning
 
