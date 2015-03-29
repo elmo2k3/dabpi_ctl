@@ -138,15 +138,29 @@ static uint16_t si46xx_read_dynamic(uint8_t *data)
 	return cnt + 6;
 }
 
-static void si46xx_get_sys_state()
+void si46xx_get_sys_state()
 {
 	uint8_t zero = 0;
 	char buf[6];
+	uint8_t mode;
 
 	si46xx_write_data(SI46XX_GET_SYS_STATE,&zero,1);
 	si46xx_read(buf,6);
+	mode = buf[4];
 	printf("si46xx_get_sys_state answer: ");
 	print_hex_str(buf,6);
+	printf("Current mode: \n");
+	switch(mode)
+	{
+		case 0: printf("Bootloader is active\n"); break;
+		case 1: printf("FMHD is active\n"); break;
+		case 2: printf("DAB is active\n"); break;
+		case 3: printf("TDMB or data only DAB image is active\n"); break;
+		case 4: printf("FMHD is active\n"); break;
+		case 5: printf("AMHD is active\n"); break;
+		case 6: printf("AMHD Demod is active\n"); break;
+		default: break;
+	}
 }
 
 static void si46xx_get_part_info()
@@ -897,8 +911,8 @@ void si46xx_init_fm()
 	store_image_from_file("firmware/fmhd_radio_3_0_19.bif",0);
 	//store_image(fmhd_radio_3_0_19_bif,fmhd_radio_3_0_19_bif_len,0);
 	si46xx_boot(read_data);
-	si46xx_get_sys_state(read_data);
-	si46xx_get_part_info(read_data);
+	si46xx_get_sys_state();
+	si46xx_get_part_info();
 	//CDC_TxString("si46xx_init() done\r\n");
 }
 
@@ -918,7 +932,7 @@ void si46xx_init_dab()
 	store_image_from_file("firmware/dab_radio_3_2_7.bif",0);
 	//store_image(dab_radio_3_2_7_bif,dab_radio_3_2_7_bif_len,0);
 	si46xx_boot(read_data);
-	si46xx_get_sys_state(read_data);
-	si46xx_get_part_info(read_data);
+	si46xx_get_sys_state();
+	si46xx_get_part_info();
 	printf("si46xx_init() done\r\n");
 }

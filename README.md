@@ -117,6 +117,7 @@ usage: ./dabpi_ctl [-a|-b]
   -m             fm rds status
   -n             dab get audio info
   -o             dab get subchannel info
+  -s             get sys state (fm,dab,am...)
   -h             this help
 ```
 

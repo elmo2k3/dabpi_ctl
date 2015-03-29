@@ -163,6 +163,7 @@ void show_help(char *prog_name)
 	printf("  -m             fm rds status\r\n");
 	printf("  -n             dab get audio info\r\n");
 	printf("  -o             dab get subchannel info\r\n");
+	printf("  -s             get sys state (fm,dab,am...)\r\n");
 	printf("  -h             this help\n");
 }
 
@@ -232,7 +233,7 @@ int main(int argc, char **argv)
 	printf("dabpi_ctl version %s\r\n",GIT_VERSION);
 
 	si46xx_init();
-	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:mno")) != -1){
+	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:mnos")) != -1){
 		switch(c){
 		case 'a':
 			init_dab();
@@ -291,6 +292,9 @@ int main(int argc, char **argv)
 			break;
 		case 'o':
 			si46xx_dab_get_subchannel_info();
+			break;
+		case 's':
+			si46xx_get_sys_state();
 			break;
 		default:
 			show_help(argv[0]);
