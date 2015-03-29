@@ -536,6 +536,26 @@ void si46xx_fm_seek_start(uint8_t up, uint8_t wrap)
 	print_hex_str(buf,4);
 }
 
+void si46xx_am_tune_freq(uint32_t khz, uint16_t antcap)
+{
+	uint8_t data[5];
+	char buf[4];
+
+	printf("si46xx_am_tune_freq(%d)\r\n",khz);
+
+	//data[0] = (1<<4) | (1<<0); // force_wb, low side injection
+	//data[0] = (1<<4)| (1<<3); // force_wb, tune_mode=2
+	data[0] = 0;
+	data[1] = ((khz) & 0xFF);
+	data[2] = ((khz) >> 8) & 0xFF;
+	data[3] = antcap & 0xFF;
+	data[4] = 0;
+	si46xx_write_data(SI46XX_AM_TUNE_FREQ,data,5);
+
+	si46xx_read(buf,4);
+	print_hex_str(buf,4);
+}
+
 
 static void si46xx_load_init()
 {
@@ -900,6 +920,24 @@ void si46xx_init_fm()
 	si46xx_get_sys_state(read_data);
 	si46xx_get_part_info(read_data);
 	//CDC_TxString("si46xx_init() done\r\n");
+}
+
+void si46xx_init_am()
+{
+	uint8_t read_data[30];
+	printf("si46xx_init_mode_am()\r\n");
+	/* reset si46xx  */
+	RESET_LOW();
+	msleep(10);
+	RESET_HIGH();
+	msleep(10);
+	si46xx_powerup(read_data);
+	store_image_from_file("firmware/rom00_patch.016.bin",0);
+	store_image_from_file("firmware/amhd_radio_1_0_5.bif",0);
+	si46xx_boot(read_data);
+	si46xx_get_sys_state(read_data);
+	si46xx_get_part_info(read_data);
+	printf("si46xx_init() done\r\n");
 }
 
 void si46xx_init_dab()

@@ -95,6 +95,12 @@ void init_fm(void)
 	si46xx_set_property(SI46XX_FM_AUDIO_DE_EMPHASIS, SI46XX_AUDIO_DE_EMPHASIS_EU); // set de-emphasis for Europe
 	si46xx_fm_tune_freq(105500,0);
 }
+void init_am(void)
+{
+	si46xx_init_am();
+	si46xx_set_property(SI46XX_PIN_CONFIG_ENABLE,0x0003); // enable I2S output
+	si46xx_set_property(SI46XX_DIGITAL_IO_OUTPUT_FORMAT,0x1000); // SAMPL_SIZE = 16, I2S mode
+}
 void init_dab(void)
 {
 	si46xx_init_dab();
@@ -135,6 +141,8 @@ void show_help(char *prog_name)
 	printf("usage: %s [-a|-b]\n",prog_name);
 	printf("  -a             init DAB mode\n");
 	printf("  -b             init fm mode\n");
+	printf("  -p             init am mode\r\n");
+	printf("  -q frequency   tune frequency in AM mode\r\n");
 	printf("  -c frequency   tune frequency in FM mode\n");
 	printf("  -d             fm status\n");
 	printf("  -e             dab status\n");
@@ -232,7 +240,7 @@ int main(int argc, char **argv)
 	printf("dabpi_ctl version %s\r\n",GIT_VERSION);
 
 	si46xx_init();
-	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:mno")) != -1){
+	while((c=getopt(argc, argv, "abc:def:ghi:j:k:l:mnopq:")) != -1){
 		switch(c){
 		case 'a':
 			init_dab();
@@ -291,6 +299,13 @@ int main(int argc, char **argv)
 			break;
 		case 'o':
 			si46xx_dab_get_subchannel_info();
+			break;
+		case 'p':
+			init_am();
+			break;
+		case 'q':
+			frequency = atoi(optarg);
+			si46xx_am_tune_freq(frequency,0);
 			break;
 		default:
 			show_help(argv[0]);
