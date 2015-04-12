@@ -50,6 +50,7 @@ make
 
 echo "Copy precompiled DABPi-Ctl Kernel to system.."
 sudo cp kernel/Image /boot/kernel.img
+sudo cp kernel/Image /boot/kernel7.img
 
 echo "Remove old modules.."
 sudo rm -rf /lib/modules
