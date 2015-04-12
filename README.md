@@ -7,6 +7,11 @@ DABPi+ for Raspberry Pi A+/B+ versions. Pi2 not tested yet.
 (https://github.com/elmo2k3/dabpi_ctl/blob/master/doc/pics/dabpi_v1.jpg)
 DABPi for older Raspberry Pi A/B versions.
 
+## News
+
+12.4.2015
+Works on Pi2 now. New Kernel 3.18.11-v7+ included for Pi2.
+
 ## Warning
 
 !!! Firmware files removed due to license issues !!!
