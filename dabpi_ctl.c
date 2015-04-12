@@ -64,7 +64,7 @@ uint32_t frequency_list_sl[] = {	CHAN_5C,
 uint32_t frequency_list_sn[] = {	CHAN_5C,
 					CHAN_6C,
 					CHAN_8D,
-					CHAN_9C,
+					CHAN_9A,
 					CHAN_12A};
 uint32_t frequency_list_st[] = {	CHAN_5C,
 					CHAN_11C,
