@@ -44,7 +44,8 @@ uint32_t frequency_list_bb[] = {	CHAN_5C,
 					CHAN_7B,
 					CHAN_7D};
 uint32_t frequency_list_hb[] = {	CHAN_5C,
-					CHAN_7B};
+					CHAN_7B,
+					CHAN_12A};
 uint32_t frequency_list_hh[] = {	CHAN_5C,
 					CHAN_7A};
 uint32_t frequency_list_he[] = {	CHAN_5C,

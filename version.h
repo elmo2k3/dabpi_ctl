@@ -1,1 +1,1 @@
-#define GIT_VERSION "v0.01-40-gfbf00e9"
+#define GIT_VERSION "v0.01-41-ged0716b"
