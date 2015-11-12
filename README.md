@@ -117,6 +117,8 @@ usage: ./dabpi_ctl [-a|-b]
                     12  Sachsen-Anhalt
                     13  Schleswig-Holstein
                     14  Thueringen
+                    15  Suedtirol (Italien)
+                    16  Schweiz
   -k region      scan frequency list
   -l up|down     fm seek next station
   -m             fm rds status

@@ -82,6 +82,13 @@ uint32_t frequency_list_it_sue[] = {	CHAN_10B,
 					CHAN_12A,
 					CHAN_12B,
 					CHAN_12C};
+uint32_t frequency_list_ch[] = {	CHAN_12A,
+					CHAN_12C,
+					CHAN_12D,
+					CHAN_7D,
+					CHAN_7A,
+					CHAN_9D,
+					CHAN_8B};
 
 void init_fm(void)
 {
@@ -159,6 +166,7 @@ void show_help(char *prog_name)
 	printf("                    13  Schleswig-Holstein\r\n");
 	printf("                    14  Thueringen\r\n");
 	printf("                    15  Suedtirol (Italien)\r\n");
+	printf("                    16  Schweiz\r\n");
 	printf("  -k region      scan frequency list\r\n");
 	printf("  -l up|down     fm seek next station\r\n");
 	printf("  -m             fm rds status\r\n");
@@ -218,6 +226,9 @@ void load_regional_channel_list(uint8_t tmp)
 	}else if(tmp == 15){
 		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_it_sue),
 					frequency_list_it_sue);
+	}else if(tmp == 16){
+		si46xx_dab_set_freq_list(ARRAY_SIZE(frequency_list_ch),
+					frequency_list_ch);
 	}else{
 		printf("Region %d not implemented\r\n",tmp);
 	}
